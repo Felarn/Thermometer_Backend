@@ -2,20 +2,20 @@ const https = require('https');
 const fs = require('fs');
 const { join } = require('path');
 
-const dataLog = {time:[],temp:[]};
+const dataLog = { time: [], temp: [] };
 
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/felarn.fun/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/felarn.fun/fullchain.pem', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
-const server = https.createServer(credentials,(req, res) => {
+const server = https.createServer(credentials, (req, res) => {
   console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    const headers = {
+  const headers = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*', 
+    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Max-Age': 2592000, 
+    'Access-Control-Max-Age': 2592000,
   };
 
   if (req.method === 'OPTIONS') {
@@ -26,32 +26,32 @@ const server = https.createServer(credentials,(req, res) => {
 
   let body = [];
 
-    if (req.method === 'GET') {
+  if (req.method === 'GET') {
     res.writeHead(200, headers);
     res.end(JSON.stringify(dataLog));
     return;
   }
 
-    if (req.method === 'POST') {
-        req.on('data', chunk => {
-    body.push(chunk);
-  }).on('end', () => {
-        body = Buffer.concat(body).toString();
-        if (body) {
-          data = JSON.parse(body);
-            console.log('data:', data);
-            if(data.epochTime && data.temp){
+  if (req.method === 'POST') {
+    req.on('data', chunk => {
+      body.push(chunk);
+    }).on('end', () => {
+      body = Buffer.concat(body).toString();
+      if (body) {
+        data = JSON.parse(body);
+        console.log('data:', data);
+        if (data.epochTime && data.temp) {
 
-              dataLog.time.push(data.epochTime*1000);
-              dataLog.temp.push(data.temp);
-            }
+          dataLog.time.push(data.epochTime * 1000);
+          dataLog.temp.push(data.temp);
         }
-        res.writeHead(200, headers);
-        res.end(`got T ${dataLog.temp[dataLog.temp.length-1]} @time ${dataLog.time[dataLog.temp.length-1]}`);
-  });
-    res.writeHead(200, headers);
-    res.end();
-    return;
+      }
+      res.writeHead(200, headers);
+      res.end(`got T ${dataLog.temp[dataLog.temp.length - 1]} @time ${dataLog.time[dataLog.temp.length - 1]}`);
+    });
+    //  res.writeHead(200, headers);
+    //  res.end();
+    //  return;
   }
 
 });
