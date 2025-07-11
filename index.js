@@ -45,7 +45,7 @@ const server = https.createServer(credentials,(req, res) => {
             dataLog.temp.push(data.temp);
         }
         res.writeHead(200, headers);
-        res.end(`got T ${data.temp[data.temp.length-1]} @time ${data.time[data.temp.length-1]}`);
+        res.end(`got T ${dataLog.temp[dataLog.temp.length-1]} @time ${dataLog.time[dataLog.temp.length-1]}`);
   });
     res.writeHead(200, headers);
     res.end();
