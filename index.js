@@ -1,9 +1,13 @@
-const http = require('http');
+const https = require('http');
 const { join } = require('path');
 
 const dataLog = {time:[],temp:[]};
 
-const server = http.createServer((req, res) => {
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/felarn.fun/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/felarn.fun/fullchain.pem', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
+
+const server = https.createServer(credentials,(req, res) => {
   console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
 //  console.log('Headers:', JSON.stringify(req.headers, null, 2));
     const headers = {
