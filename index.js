@@ -16,7 +16,6 @@ const server = https.createServer(credentials,(req, res) => {
     'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': 2592000, 
-
   };
 
   if (req.method === 'OPTIONS') {
@@ -41,8 +40,11 @@ const server = https.createServer(credentials,(req, res) => {
         if (body) {
           data = JSON.parse(body);
             console.log('data:', data);
-            dataLog.time.push(data.epochTime*1000);
-            dataLog.temp.push(data.temp);
+            if(data.epochTime && data.temp){
+
+              dataLog.time.push(data.epochTime*1000);
+              dataLog.temp.push(data.temp);
+            }
         }
         res.writeHead(200, headers);
         res.end(`got T ${dataLog.temp[dataLog.temp.length-1]} @time ${dataLog.time[dataLog.temp.length-1]}`);
