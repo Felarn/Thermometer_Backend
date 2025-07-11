@@ -10,13 +10,13 @@ const credentials = { key: privateKey, cert: certificate };
 
 const server = https.createServer(credentials,(req, res) => {
   console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
-//  console.log('Headers:', JSON.stringify(req.headers, null, 2));
     const headers = {
-    'Content-Type': 'text/plain',
-    'Access-Control-Allow-Origin': '*', /* @dev First, read about security */
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*', 
     'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
-    'Access-Control-Max-Age': 2592000, // 30 days
-    /** add other headers as per requirement */
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': 2592000, 
+
   };
 
   if (req.method === 'OPTIONS') {
@@ -26,7 +26,15 @@ const server = https.createServer(credentials,(req, res) => {
   }
 
   let body = [];
-  req.on('data', chunk => {
+
+    if (req.method === 'GET') {
+    res.writeHead(200, headers);
+    res.end(JSON.stringify(dataLog));
+    return;
+  }
+
+    if (req.method === 'POST') {
+        req.on('data', chunk => {
     body.push(chunk);
   }).on('end', () => {
         body = Buffer.concat(body).toString();
@@ -37,8 +45,17 @@ const server = https.createServer(credentials,(req, res) => {
             dataLog.temp.push(data.temp);
         }
         res.writeHead(200, headers);
-        res.end(JSON.stringify(dataLog));
+        res.end(`got T ${data.temp.at(-1)} @time ${data.time.at(-1)}`);
   });
+    res.writeHead(200, headers);
+    res.end();
+    return;
+  }
+
+});
+
+server.on('error', (error) => {
+  console.error('Server error:', error);
 });
 
 const PORT = 443;
