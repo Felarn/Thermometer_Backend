@@ -1,7 +1,7 @@
 const http = require('http');
 const { join } = require('path');
 
-const dataLog = [];
+const dataLog = {time:[],temp:[]};
 
 const server = http.createServer((req, res) => {
   console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -12,10 +12,11 @@ const server = http.createServer((req, res) => {
     body.push(chunk);
   }).on('end', () => {
         body = Buffer.concat(body).toString();
-        data = JSON.stringify(body);
+        data = JSON.parse(body);
         if (body) {
-            console.log('data:', body);
-            dataLog.push(Number(body));
+            console.log('data:', data);
+            dataLog.time.push(data.epochTime*1000);
+            dataLog.temp.push(data.temp);
         }
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end(JSON.stringify(dataLog));
