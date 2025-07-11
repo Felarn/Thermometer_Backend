@@ -12,8 +12,8 @@ const server = http.createServer((req, res) => {
     body.push(chunk);
   }).on('end', () => {
         body = Buffer.concat(body).toString();
-        data = JSON.parse(body);
         if (body) {
+          data = JSON.parse(body);
             console.log('data:', data);
             dataLog.time.push(data.epochTime*1000);
             dataLog.temp.push(data.temp);
