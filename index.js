@@ -12,7 +12,9 @@ const server = http.createServer((req, res) => {
     body.push(chunk);
   }).on('end', () => {
         body = Buffer.concat(body).toString();
-        if (body) {console.log('Body:', body);
+        data = JSON.stringify(body);
+        if (body) {
+            console.log('data:', body);
             dataLog.push(Number(body));
         }
         res.writeHead(200, { 'Content-Type': 'text/plain' });
