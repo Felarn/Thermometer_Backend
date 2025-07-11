@@ -1,4 +1,5 @@
 const https = require('http');
+const fs = require('fs');
 const { join } = require('path');
 
 const dataLog = {time:[],temp:[]};
