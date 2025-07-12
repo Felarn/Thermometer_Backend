@@ -9,6 +9,8 @@ const certificate = fs.readFileSync('/etc/letsencrypt/live/felarn.fun/fullchain.
 const credentials = { key: privateKey, cert: certificate };
 
 const server = https.createServer(credentials, (req, res) => {
+
+  try{
   console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
   const headers = {
     'Content-Type': 'application/json',
@@ -17,6 +19,12 @@ const server = https.createServer(credentials, (req, res) => {
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': 2592000,
   };
+  
+  if (req.url !== '/'){
+    res.writeHead(400);
+    res.end();
+    return;
+  }
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204, headers);
@@ -25,7 +33,7 @@ const server = https.createServer(credentials, (req, res) => {
   }
 
   let body = [];
-
+  
   if (req.method === 'GET') {
     res.writeHead(200, headers);
     res.end(JSON.stringify(dataLog));
@@ -53,7 +61,9 @@ const server = https.createServer(credentials, (req, res) => {
     //  res.end();
     //  return;
   }
-
+}catch(error){
+    console.error(error);
+}
 });
 
 server.on('error', (error) => {
