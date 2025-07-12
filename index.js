@@ -62,12 +62,12 @@ const server = https.createServer(credentials, (req, res) => {
     //  return;
   }
 }catch(error){
-    console.error(error);
+    console.log(error);
 }
 });
 
 server.on('error', (error) => {
-  console.error('Server error:', error);
+  console.log('Server error:', error);
 });
 
 const PORT = 443;
