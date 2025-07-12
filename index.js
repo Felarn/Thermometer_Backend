@@ -1,73 +1,101 @@
+// const https = require('http');
 const https = require('https');
 const fs = require('fs');
 const { join } = require('path');
 
 const dataLog = { time: [], temp: [] };
 
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/felarn.fun/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/felarn.fun/fullchain.pem', 'utf8');
+function writeErrorToFile(error, filePath = 'error_log.txt') {
+  const errorMessage = `${new Date().toISOString()} - ${error.message}\n${
+    error.stack
+  }\n\n`;
+  fs.appendFile(filePath, errorMessage, (err) => {
+    if (err) {
+      console.error('Failed to write error to file:', err);
+    }
+  });
+}
+
+const privateKey = fs.readFileSync(
+  '/etc/letsencrypt/live/felarn.fun/privkey.pem',
+  'utf8'
+);
+const certificate = fs.readFileSync(
+  '/etc/letsencrypt/live/felarn.fun/fullchain.pem',
+  'utf8'
+);
 const credentials = { key: privateKey, cert: certificate };
 
 const server = https.createServer(credentials, (req, res) => {
+  // const server = https.createServer((req, res) => {
+  try {
+    console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    const headers = {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': 2592000,
+    };
 
-  try{
-  console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Max-Age': 2592000,
-  };
-  
-  if (req.url !== '/'){
-    res.writeHead(400);
-    res.end();
-    return;
-  }
+    if (req.url !== '/') {
+      res.writeHead(400);
+      res.end();
+      return;
+    }
 
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204, headers);
-    res.end();
-    return;
-  }
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, headers);
+      res.end();
+      return;
+    }
 
-  let body = [];
-  
-  if (req.method === 'GET') {
-    res.writeHead(200, headers);
-    res.end(JSON.stringify(dataLog));
-    return;
-  }
+    let body = [];
 
-  if (req.method === 'POST') {
-    req.on('data', chunk => {
-      body.push(chunk);
-    }).on('end', () => {
-      body = Buffer.concat(body).toString();
-      if (body) {
-        data = JSON.parse(body);
-        console.log('data:', data);
-        if (data.epochTime && data.temp) {
-
-          dataLog.time.push(data.epochTime * 1000);
-          dataLog.temp.push(data.temp);
-        }
-      }
+    if (req.method === 'GET') {
       res.writeHead(200, headers);
-      res.end(`got T ${dataLog.temp[dataLog.temp.length - 1]} @time ${dataLog.time[dataLog.temp.length - 1]}`);
-    });
-    //  res.writeHead(200, headers);
-    //  res.end();
-    //  return;
+      res.end(JSON.stringify(dataLog));
+      return;
+    }
+
+    if (req.method === 'POST') {
+      req
+        .on('data', (chunk) => {
+          body.push(chunk);
+        })
+        .on('end', () => {
+          try {
+            body = Buffer.concat(body).toString();
+            if (body) {
+              data = JSON.parse(body);
+              console.log('data:', data);
+              if (data.epochTime && data.temp) {
+                dataLog.time.push(data.epochTime * 1000);
+                dataLog.temp.push(data.temp);
+              }
+            }
+            res.writeHead(200, headers);
+            res.end(
+              `got T ${dataLog.temp[dataLog.temp.length - 1]} @time ${
+                dataLog.time[dataLog.temp.length - 1]
+              }`
+            );
+          } catch (error) {
+            console.log(error);
+            writeErrorToFile(error);
+            res.writeHead(400);
+            res.end();
+            return;
+          }
+        });
+    }
+  } catch (error) {
+    console.error(error);
   }
-}catch(error){
-    console.log(error);
-}
 });
 
 server.on('error', (error) => {
-  console.log('Server error:', error);
+  console.error('Server error:', error);
 });
 
 const PORT = 443;
