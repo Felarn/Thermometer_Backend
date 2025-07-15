@@ -70,6 +70,7 @@ const server = https.createServer(credentials, (req, res) => {
               data = JSON.parse(body);
               console.log('data:', data);
               if (data.epochTime && data.temp) {
+                console.log("data added")
                 dataLog.time.push(... data.epochTime.map(item => item * 1000));
                 dataLog.temp.push(... data.temp);
               }
