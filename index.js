@@ -3,7 +3,7 @@ const https = require('https');
 const fs = require('fs');
 const { join } = require('path');
 
-const dataLog = { time: [], temp: [] };
+const dataLog = { time: [], temp: [], restartTime: [] , restartCounter:[]};
 
 function writeErrorToFile(error, filePath = 'error_log.txt') {
   const errorMessage = `${new Date().toISOString()} - ${error.message}\n${
@@ -74,12 +74,18 @@ const server = https.createServer(credentials, (req, res) => {
                 dataLog.time.push(... data.epochTime.map(item => item * 1000));
                 dataLog.temp.push(... data.temp);
               }
+
+              if (data.restartTime && data.restartCount) {
+                console.log("data added")
+                dataLog.restartTime.push(... data.restartTime.map(item => item * 1000));
+                dataLog.restartCount.push(... data.restartCount);
+              }
             }
             res.writeHead(200, headers);
             res.end(
-              `got T ${dataLog.temp[dataLog.temp.length - 1]} @time ${
-                dataLog.time[dataLog.temp.length - 1]
-              }`
+//              `got T ${dataLog.temp[dataLog.temp.length - 1]} @time ${
+//                dataLog.time[dataLog.temp.length - 1]
+//              }`
             );
           } catch (error) {
             console.log(error);
