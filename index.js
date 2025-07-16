@@ -77,8 +77,8 @@ const server = https.createServer(credentials, (req, res) => {
 
               if (data.restartTime && data.restartCount) {
                 console.log("data added")
-                dataLog.restartTime.push(... data.restartTime.map(item => item * 1000));
-                dataLog.restartCount.push(... data.restartCount);
+                dataLog.restartTime.push( data.restartTime * 1000);
+                dataLog.restartCount.push( data.restartCount);
               }
             }
             res.writeHead(200, headers);
