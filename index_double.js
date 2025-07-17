@@ -73,7 +73,7 @@ const requestHandler = (req, res) => {
           body.push(chunk);
         })
         .on('end', () => {
-          res.writeHead(200, headers);
+          res.writeHead(200);
           res.end();
 
           try {
