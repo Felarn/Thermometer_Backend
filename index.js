@@ -78,10 +78,11 @@ const server = https.createServer(credentials, (req, res) => {
               data = JSON.parse(body);
               console.log('data:', data);
               if (data.epochTime && data.temp && data.epochTime.length>0) {
-                const startingIndex = findOccuranceFromTheEnd(dataLog.time,data.epochTime[0])
+                console.log('processing time/temp')
+                const startingIndex = findOccuranceFromTheEnd(dataLog.time, data.epochTime[0])
+                console.log("duplicate index: " + startingIndex)
                 if (startingIndex>=0){
                   console.log("duplicates spliced")
-                  
                   dataLog.time.splice(startingIndex)
                 }
                 console.log("data added")
