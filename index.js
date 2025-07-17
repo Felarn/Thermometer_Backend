@@ -84,6 +84,7 @@ const server = https.createServer(credentials, (req, res) => {
                 if (startingIndex>=0){
                   console.log("duplicates spliced")
                   dataLog.time.splice(startingIndex)
+                  dataLog.temp.splice(startingIndex)
                 }
                 console.log("data added")
                 dataLog.time.push(... data.epochTime.map(item => item * 1000));
