@@ -3,12 +3,12 @@ const https = require('https');
 const fs = require('fs');
 const { join } = require('path');
 
-const dataLog = { time: [], temp: [], restartTime: [] , restartCounter:[]};
+const dataLog = { time: [], temp: [], restartTime: [], restartCounter: [] };
 
-const findOccuranceFromTheEnd=(arr,item)=>{
-  console.log("searching " + item + "in" )
- // console.log(arr)
-  for (let i=arr.length-1;(i>=0)&&(i>arr.length-1010);i--){
+const findOccuranceFromTheEnd = (arr, item) => {
+  console.log("searching " + item + "in")
+  // console.log(arr)
+  for (let i = arr.length - 1; (i >= 0) && (i > arr.length - 1010); i--) {
     if (item === arr[i])
       return i;
   }
@@ -16,9 +16,8 @@ const findOccuranceFromTheEnd=(arr,item)=>{
 }
 
 function writeErrorToFile(error, filePath = 'error_log.txt') {
-  const errorMessage = `${new Date().toISOString()} - ${error.message}\n${
-    error.stack
-  }\n\n`;
+  const errorMessage = `${new Date().toISOString()} - ${error.message}\n${error.stack
+    }\n\n`;
   fs.appendFile(filePath, errorMessage, (err) => {
     if (err) {
       console.error('Failed to write error to file:', err);
@@ -74,36 +73,36 @@ const server = https.createServer(credentials, (req, res) => {
           body.push(chunk);
         })
         .on('end', () => {
-            res.writeHead(200, headers);
-            res.end(
-//              `got T ${dataLog.temp[dataLog.temp.length - 1]} @time ${
-//                dataLog.time[dataLog.temp.length - 1]
-//              }`
-            );
-            
+          res.writeHead(200, headers);
+          res.end(
+            //              `got T ${dataLog.temp[dataLog.temp.length - 1]} @time ${
+            //                dataLog.time[dataLog.temp.length - 1]
+            //              }`
+          );
+
           try {
             body = Buffer.concat(body).toString();
             if (body) {
               data = JSON.parse(body);
               console.log('data:', data);
-              if (data.epochTime && data.temp && data.epochTime.length>0) {
+              if (data.epochTime && data.temp && data.epochTime.length > 0) {
                 console.log('processing time/temp')
-                const startingIndex = findOccuranceFromTheEnd(dataLog.time, data.epochTime[0]*1000)
+                const startingIndex = findOccuranceFromTheEnd(dataLog.time, data.epochTime[0] * 1000)
                 console.log("duplicate index: " + startingIndex)
-                if (startingIndex>=0){
+                if (startingIndex >= 0) {
                   console.log("duplicates spliced")
                   dataLog.time.splice(startingIndex)
                   dataLog.temp.splice(startingIndex)
                 }
                 console.log("data added")
-                dataLog.time.push(... data.epochTime.map(item => item * 1000));
-                dataLog.temp.push(... data.temp);
+                dataLog.time.push(...data.epochTime.map(item => item * 1000));
+                dataLog.temp.push(...data.temp);
               }
 
               if (data.restartTime && data.restartCount) {
                 console.log("data added")
-                dataLog.restartTime.push( data.restartTime * 1000);
-                dataLog.restartCount.push( data.restartCount);
+                dataLog.restartTime.push(data.restartTime * 1000);
+                dataLog.restartCount.push(data.restartCount);
               }
             }
 
