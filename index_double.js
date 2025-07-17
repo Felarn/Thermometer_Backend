@@ -73,7 +73,9 @@ const requestHandler = (req, res) => {
           body.push(chunk);
         })
         .on('end', () => {
-          res.writeHead(200,headers);
+         // res.writeHead(200,headers);
+         // res.end(JSON.stringify({ status: 'success', message: 'Data received' }));
+          res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ status: 'success', message: 'Data received' }));
 
           try {
