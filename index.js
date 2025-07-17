@@ -6,6 +6,8 @@ const { join } = require('path');
 const dataLog = { time: [], temp: [], restartTime: [] , restartCounter:[]};
 
 const findOccuranceFromTheEnd=(arr,item)=>{
+  console.log("searching " + item + "in" )
+  console.log(arr)
   for (let i=arr.length-1;(i>=0)&&(i>arr.length-1010);i--){
     if (item === arr[i])
       return i;
