@@ -73,8 +73,8 @@ const requestHandler = (req, res) => {
           body.push(chunk);
         })
         .on('end', () => {
-          res.writeHead(200);
-          res.end();
+          res.writeHead(200,headers);
+          res.end(JSON.stringify({ status: 'success', message: 'Data received' }));
 
           try {
             body = Buffer.concat(body).toString();
