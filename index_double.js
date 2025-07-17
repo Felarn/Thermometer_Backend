@@ -2,7 +2,7 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 
-const dataLog = { time: [], temp: [], restartTime: [], restartCount: [] };
+const dataLog = { time: [], temp: [], restartTime: [], restartCount: [], duplicateTime:[] };
 
 // Функция для поиска индекса с конца
 const findOccuranceFromTheEnd = (arr, item) => {
@@ -92,10 +92,11 @@ const requestHandler = (req, res) => {
                 );
                 console.log("duplicate index: " + startingIndex);
                 if (startingIndex >= 0) {
+                  dataLog.duplicateTime.push(Date.now());
                   console.log("duplicates spliced");
                   dataLog.time.splice(startingIndex);
                   dataLog.temp.splice(startingIndex);
-                }
+                } 
                 console.log("data added");
                 dataLog.time.push(...data.epochTime.map(item => item * 1000));
                 dataLog.temp.push(...data.temp);
