@@ -133,7 +133,7 @@ const httpServer = http.createServer(requestHandler);
 httpServer.on('error', (error) => {
   console.error('HTTP Server error:', error);
 });
-const HTTP_PORT = 3001;
+const HTTP_PORT = 80;
 httpServer.listen(HTTP_PORT, () => {
   console.log(`HTTP server running at http://localhost:${HTTP_PORT}/`);
 });
