@@ -74,6 +74,13 @@ const server = https.createServer(credentials, (req, res) => {
           body.push(chunk);
         })
         .on('end', () => {
+            res.writeHead(200, headers);
+            res.end(
+//              `got T ${dataLog.temp[dataLog.temp.length - 1]} @time ${
+//                dataLog.time[dataLog.temp.length - 1]
+//              }`
+            );
+            
           try {
             body = Buffer.concat(body).toString();
             if (body) {
@@ -99,12 +106,7 @@ const server = https.createServer(credentials, (req, res) => {
                 dataLog.restartCount.push( data.restartCount);
               }
             }
-            res.writeHead(200, headers);
-            res.end(
-//              `got T ${dataLog.temp[dataLog.temp.length - 1]} @time ${
-//                dataLog.time[dataLog.temp.length - 1]
-//              }`
-            );
+
           } catch (error) {
             console.log(error);
             writeErrorToFile(error);
