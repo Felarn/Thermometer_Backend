@@ -5,6 +5,14 @@ const { join } = require('path');
 
 const dataLog = { time: [], temp: [], restartTime: [] , restartCounter:[]};
 
+const findOccuranceFromTheEnd=(arr,item)=>{
+  for (let i=arr.length-1;i>arr.length-1010||arr>=0;i--){
+    if (item === arr[i])
+      return i;
+  }
+  return -1;
+}
+
 function writeErrorToFile(error, filePath = 'error_log.txt') {
   const errorMessage = `${new Date().toISOString()} - ${error.message}\n${
     error.stack
@@ -69,7 +77,13 @@ const server = https.createServer(credentials, (req, res) => {
             if (body) {
               data = JSON.parse(body);
               console.log('data:', data);
-              if (data.epochTime && data.temp) {
+              if (data.epochTime && data.temp && data.epochTime.length>0) {
+                const startingIndex = findOccuranceFromTheEnd(dataLog.time,data.epochTime[0])
+                if (startingIndex>=0){
+                  console.log("duplicates spliced")
+                  
+                  dataLog.time.splice(-startingIndex,startingIndex)
+                }
                 console.log("data added")
                 dataLog.time.push(... data.epochTime.map(item => item * 1000));
                 dataLog.temp.push(... data.temp);
