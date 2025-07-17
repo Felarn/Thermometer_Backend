@@ -2,7 +2,7 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 
-const dataLog = { time: [], temp: [], restartTime: [], restartCounter: [] };
+const dataLog = { time: [], temp: [], restartTime: [], restartCount: [] };
 
 // Функция для поиска индекса с конца
 const findOccuranceFromTheEnd = (arr, item) => {

@@ -3,7 +3,7 @@ const https = require('https');
 const fs = require('fs');
 const { join } = require('path');
 
-const dataLog = { time: [], temp: [], restartTime: [], restartCounter: [] };
+const dataLog = { time: [], temp: [], restartTime: [], restartCount: [] };
 
 const findOccuranceFromTheEnd = (arr, item) => {
   console.log("searching " + item + "in")
