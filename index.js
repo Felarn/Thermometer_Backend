@@ -81,7 +81,7 @@ const server = https.createServer(credentials, (req, res) => {
               console.log('data:', data);
               if (data.epochTime && data.temp && data.epochTime.length>0) {
                 console.log('processing time/temp')
-                const startingIndex = findOccuranceFromTheEnd(dataLog.time, data.epochTime[0])
+                const startingIndex = findOccuranceFromTheEnd(dataLog.time, data.epochTime[0]*1000)
                 console.log("duplicate index: " + startingIndex)
                 if (startingIndex>=0){
                   console.log("duplicates spliced")
