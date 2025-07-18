@@ -2,7 +2,18 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 
-const dataLog = { time: [], temp: [], restartTime: [], restartCount: [], duplicateTime:[] };
+const dataLog = {
+  restartCount: [],
+  restartTime: [],
+  duplicateTime: [],
+  voltage:[],
+  rawPinValue: [],
+  estimatedCharge:[],
+  chargeReportTime: [],
+  messageTime:[],
+  time: [],
+  temp: [],
+};
 
 // Функция для поиска индекса с конца
 const findOccuranceFromTheEnd = (arr, item) => {
@@ -14,9 +25,8 @@ const findOccuranceFromTheEnd = (arr, item) => {
 
 // Функция для записи ошибок в файл
 function writeErrorToFile(error, filePath = 'error_log.txt') {
-  const errorMessage = `${new Date().toISOString()} - ${error.message}\n${
-    error.stack
-  }\n\n`;
+  const errorMessage = `${new Date().toISOString()} - ${error.message}\n${error.stack
+    }\n\n`;
   fs.appendFile(filePath, errorMessage, (err) => {
     if (err) {
       console.error('Failed to write error to file:', err);
@@ -73,13 +83,14 @@ const requestHandler = (req, res) => {
           body.push(chunk);
         })
         .on('end', () => {
-         // res.writeHead(200,headers);
-         // res.end(JSON.stringify({ status: 'success', message: 'Data received' }));
+          // res.writeHead(200,headers);
+          // res.end(JSON.stringify({ status: 'success', message: 'Data received' }));
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ status: 'success', message: 'Data received' }));
 
           try {
             body = Buffer.concat(body).toString();
+            dataLog.messageTime.push(Date.now())
             if (body) {
               const data = JSON.parse(body);
               console.log('data:', data);
@@ -90,22 +101,31 @@ const requestHandler = (req, res) => {
                   dataLog.time,
                   data.epochTime[0] * 1000
                 );
+
                 console.log("duplicate index: " + startingIndex);
                 if (startingIndex >= 0) {
                   dataLog.duplicateTime.push(Date.now());
                   console.log("duplicates spliced");
                   dataLog.time.splice(startingIndex);
                   dataLog.temp.splice(startingIndex);
-                } 
+                }
                 console.log("data added");
                 dataLog.time.push(...data.epochTime.map(item => item * 1000));
                 dataLog.temp.push(...data.temp);
               }
 
               if (data.restartTime && data.restartCount) {
-                console.log("data added");
+                console.log("RESTART added");
                 dataLog.restartTime.push(data.restartTime * 1000);
                 dataLog.restartCount.push(data.restartCount);
+              }
+              
+              if (data.rawPinValue || data.voltage || data.estimatedCharge){
+                console.log("charge data added");
+                dataLog.chargeReportTime.push(Date.now());
+                dataLog.rawPinValue.push(data.rawPinValue)
+                dataLog.voltage.push(data.voltage)
+                dataLog.estimatedCharge.push(data.estimatedCharge)
               }
             }
           } catch (error) {
